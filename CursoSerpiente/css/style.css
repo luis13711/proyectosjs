@@ -1,0 +1,27 @@
+
+.fondo{
+	background: blue;
+}
+.borde{
+	border-style: solid;
+	border-radius: 35px 35px 35px 35px;
+	-moz-border-radius: 35px 35px 35px 35px;
+	-webkit-border-radius: 35px 35px 35px 35px;
+	
+}
+
+.con-borde{
+	border: 1px;
+	border-style: solid;
+	color: #FFFFFF;
+	text-align: center;
+}
+.con-borde1{
+	border: 1px;
+	border-style: solid;
+	text-align: center;
+}
+.color1{ background: blue; }
+.color2{ background: red; }
+.color3{ background: green; }
+.color4{ background: black; }
