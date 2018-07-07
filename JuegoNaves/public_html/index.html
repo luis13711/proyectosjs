@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Juego de naves</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script type="text/javascript" src="js/phaser.min.js">
+        </script>
+    </head>
+    <body>
+        <script type="text/javascript">
+            var platillo;
+            var fondoMarte;
+            var platillos;
+            var plataformas;
+            var score = 0;
+            var scoreText;
+            var cursors;
+            var municion;
+            var cont = 0;
+            var tam = 30;
+            
+            var marte = new Phaser.Game(800, 600, Phaser.AUTO, 'marte',
+            {
+                preload: preload,
+                create: create,
+                update: update
+            });
+            function preload() {
+                //Aquí se cargaran los sprites
+                marte.load.image('espacio','img/fondo.png');
+                marte.load.image('platillo','img/nave.png');
+                marte.load.image('asteroide','img/asteroide.png');
+                marte.load.image('barra','img/platform.png');
+                marte.load.image('bala','img/bala.png');
+            }
+            function create() {
+                //agregar física al juego
+                marte.physics.startSystem(Phaser.Physics.ARCADE);
+
+                //Aquí se agrega la imagen
+                fondoMarte = marte.add.tileSprite(0, 0, 800, 600, 'espacio');
+
+                platillo = marte.add.sprite(40, marte.height / 2, 'platillo');
+                //permite controlar colisiciones del platillo
+                marte.physics.arcade.enable(platillo);
+                //evita que salga de la pantalla
+                platillo.body.collideWorldBounds = true;
+
+                //asteroides
+                platillos = marte.add.group();
+                platillos.enableBody = true;
+                platillos.physicsBodyType = Phaser.Physics.ARCADE;
+
+                //plataformas
+                plataformas = marte.add.group();
+                plataformas.enableBody = true;
+                var piso = plataformas.create(0, marte.world.height - 64, 'barra');
+                //para adaptarse a la anchura de la pantalla
+                piso.scale.setTo(2, 2);
+                //para que no se salga de la pantalla
+                piso.body.collideWorldBounds = true;
+                //mejor es para que no se pueda mover
+                piso.body.inmovable = true;
+                
+                
+                
+                
+                municion = marte.add.group();
+                municion.enableBody = true;
+                municion.physicsBodyType = Phaser.Physics.ARCADE;
+                municion.createMultiple(tam, 'bala');
+                municion.setAll('anchor.x', 0.5);
+                municion.setAll('anchor.y', 0.5);
+                municion.setAll('outOfBoundsKill', true);
+                
+                
+                
+                
+                
+                
+                /*
+                var barra = plataformas.create(0, 0, 'barra');
+                //para adaptarse a la anchura de la pantalla
+                barra.scale.setTo(2, 2);
+                //para que no se salga de la pantalla
+                barra.body.collideWorldBounds = true;
+                //mejor es para que no se pueda mover
+                barra.body.inmovable = true;
+                */
+                for(var i = 0; i < 10; i++){
+                    var asteroide = platillos.create(100 + i * 50, 50, 'asteroide');
+                    //Agregar física
+                    //fisica para que no salga del campo de batalla
+                    asteroide.body.collideWorldBounds = true;
+                    //física de juego de plataforma
+                    asteroide.body.gravity.y = 100 + Math.random() * 100;
+                    asteroide.body.gravity.x = marte.rnd.integerInRange(-50, 50);
+                    //para que rebote al caer si se coloca 1 no deja de  rebotar
+                    //si se coloca 0.01 no rebota
+                    asteroide.body.bounce.setTo(0.8);
+                }
+
+
+                //  The score
+                scoreText = marte.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#255' });
+                
+                //controlar eventos del teclado
+                cursors = marte.input.keyboard.createCursorKeys();
+            }
+            function update() {
+                //las estrellas y el jugador no traspasan a las plataformas
+                //marte.physics.arcade.collide(platillo, platillos);
+                marte.physics.arcade.collide(plataformas, platillos);
+                marte.physics.arcade.collide(platillo, plataformas);
+                
+                //arreglar disparos despues de cierto punto presentan error
+                if (marte.input.activePointer.isDown)
+                {
+                    //  disparar
+                    disparar();
+                }
+                
+                if (cursors.left.isDown)
+                {
+                    //  Move to the left
+                    platillo.body.velocity.x -= 10;
+                }
+                else if (cursors.right.isDown)
+                {
+                    //  Move to the right
+                    platillo.body.velocity.x += 10;
+                }
+                else if (cursors.up.isDown)
+                {
+                    //  Move to the right
+                    platillo.body.velocity.y -= 10;
+                }
+                else if (cursors.down.isDown)
+                {
+                    //  Move to the right
+                    platillo.body.velocity.y += 10;
+                }
+                //controlar colisiones personalizadas
+                marte.physics.arcade.overlap(platillo, platillos, collectStar, null, this);
+                marte.physics.arcade.overlap(municion, platillos, collectStar, null, this);
+                
+            }
+            function collectStar (platillo, star) {
+
+                // Removes the star from the screen
+                star.kill();
+
+                //  Add and update the score
+                score += 10;
+                scoreText.text = 'Score: ' + score;
+
+            }
+            function disparar2(){
+                if(cont < tam)
+                {
+                    var bala = municion.getFirstDead();
+                    bala.anchor.setTo(0.5);
+                    bala.reset(platillo.x, platillo.y);
+                    //bala.rotation = juego.physics.arcade.angleToPointer(bala);
+                    marte.physics.arcade.moveToPointer(bala, 300);
+                }
+                cont += 1;
+            }
+            function disparar() {
+                //  To avoid them being allowed to fire too fast we set a time limit
+                if (cont < tam)
+                {
+                    //  Grab the first bullet we can from the pool
+                    bala = municion.getFirstDead(false);
+
+                    if (bala)
+                    {
+                        //  And fire it
+                        bala.anchor.setTo(0.5);
+                        bala.reset(platillo.x, platillo.y + 25);
+                        bala.body.velocity.x = 400;
+                        //bulletTime = game.time.now + 200;
+                        cont += 1;
+                    }
+                }
+
+}
+        </script>
+    </body>
+</html>
