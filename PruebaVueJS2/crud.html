@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="js/jquery-2.2.3.min.js"></script>
+        <script src="https://unpkg.com/vue"></script>
+    </head>
+    <body>
+        <div id="example-2">
+          <!-- `greet` is the name of a method defined below -->
+          <button v-on:click="greet">Greet</button>
+
+          <h1>Agregar Elementos</h1>
+            Agregar ID: <input v-model="id" type="text" id="id" />
+            Agregar Hotel: <input v-model="nombre" type="text" id="nombre" />
+            <button v-on:click="greet2">Agregar</button>     
+        
+
+        <h1>Eliminar Elemento</h1>
+        Ingrese id Hotel: <input v-model="id" type="text" id="id" />
+            <button v-on:click="eliminar">Eliminar</button>
+        
+    
+        <h1>Actualizar Elemento</h1>
+        Ingrese id Hotel: <input v-model="id" type="text" id="id" />
+        Agregar nuevo Hotel: <input v-model="nombre" type="text" id="nombre" />
+            <button v-on:click="actualizar">Actualizar</button>
+        
+        
+        <h1>Elementos</h1>
+            <div v-for="elemento in elementos">
+                {{ elemento.id }} - {{ elemento.nombre }}
+            </div>
+
+        </div>
+        <script type="text/javascript">
+            
+            var elementosjs = [
+                {
+                    id: 1, 
+                    nombre: 'Hotel Varadero 1'
+                },
+                {
+                    id: 2, 
+                    nombre: 'Hotel Varadero 2'
+                }
+            ];
+var example2 = new Vue({
+  el: '#example-2',
+  data: {
+    name: 'Vue.js',
+    elementos:elementosjs,
+    id:"",
+    nombre:""
+  },
+  // define methods under the `methods` object
+  methods: {
+    greet: function (event) {
+      // `this` inside methods points to the Vue instance
+      alert('Hello ' + this.name + '!')
+      // `event` is the native DOM event
+      if (event) {
+        alert(event.target.tagName)
+      }
+    },
+    greet2: function (event) {
+        var idHotel = this.id;
+        var nombre = this.nombre;
+        var elemento = {
+            id: idHotel,
+            nombre: nombre
+        };
+        this.elementos.push(elemento);
+        //alert('funciono');
+    },
+    eliminar: function(event){
+        for (i = 0; i < this.elementos.length; i++) {
+          if(this.id == this.elementos[i].id){
+                var pos = i;
+                var n = 1;
+                var elementosEliminados = this.elementos.splice(pos, n);
+                
+                // así es como se eliminan elementos, n define la cantidad de elementos a eliminar,
+                // de esa posicion(pos) en adelante hasta el final del array.
+          }
+        }
+    },
+    actualizar: function(event){
+        for (i = 0; i < this.elementos.length; i++) {
+            if(this.id == this.elementos[i].id){
+                this.elementos[i].nombre = this.nombre;
+            }
+        }
+    }
+  }
+})
+        </script>
+    </body>
+</html>
+
